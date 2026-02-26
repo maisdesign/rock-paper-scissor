@@ -32,7 +32,7 @@ function Matcher({ score, matches, cpuscore, version, result, picker, chosen, se
             <div className="d-flex align-items-center justify-content-center gap-4">
                 <div className="d-flex flex-column align-items-center gap-2">
                     <span className="player-label text-uppercase small">Tu</span>
-                    <img className="choice-img" src={`/icons/${imageShow(imgSet, chosen)}`} alt={chosen} />
+                    <img className={"choice-img" + ((version === 'classic') ? " choice-classic" : " choice-advanced")} src={`/icons/${imageShow(imgSet, chosen)}`} alt={chosen} />
                 </div>
                 <span className="vs-badge fw-black">VS</span>
                 <div className="d-flex flex-column align-items-center gap-2">
