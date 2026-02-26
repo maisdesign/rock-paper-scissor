@@ -1,63 +1,76 @@
-# Rock Paper Scissors ✊✋✌️
+# Rock Paper Scissors ✊✋✌️🦎🖖
 
-> Progetto realizzato nell'ambito del corso **Boolean Web Development** — modulo JavaScript Functions.
-> Versione estesa con **React + Vite** per allenamento sui componenti.
-
----
-
-## Descrizione
-
-Gioco Carta Forbice Sasso in **5 round** contro il computer.
-Il giocatore sceglie cliccando su un'immagine, il computer estrae casualmente, un componente confronta le due scelte e mostra il risultato. Al termine dei 5 round è possibile riavviare la partita.
+> Project built as part of the **Boolean Web Development** bootcamp — JavaScript Functions module.
+> Extended version with **React + Vite** for component-based architecture practice.
 
 ---
 
-## Struttura componenti
+## Description
+
+Rock Paper Scissors (with optional Lizard-Spock variant) played over **5 rounds** against the computer.
+The player chooses by clicking a weapon icon, the CPU picks randomly, and the result is calculated and displayed. At the end of 5 rounds the game can be restarted.
+
+Two game modes available:
+- **Classic** — Rock, Paper, Scissors
+- **Advanced** — Rock, Paper, Scissors, Lizard, Spock
+
+---
+
+## Component Structure
 
 ```
 App.jsx
 ├── data/
-│   ├── possibilities.js   — array armi { id, label, src } + voce 'start'
-│   └── rules.js           — oggetto mappa delle regole (chi batte chi)
+│   ├── possibilities.js        — weapons array { id, label, src } + 'start' entry
+│   ├── possibilitiesAdvanced.js — same with Lizard and Spock added
+│   ├── rules.js                — classic rules map (who beats whom)
+│   └── rulesAdvanced.js        — advanced rules map with wins object and flavor text
 └── components/
-    ├── Chooser.jsx        — bottoni arma, estrazione CPU, calcolo risultato (funzione pura)
-    └── Matcher.jsx        — immagini scelte, risultato round, score, alert finale Bootstrap
+    ├── Chooser.jsx             — weapon buttons, CPU pick, result calculation
+    ├── Matcher.jsx             — chosen images, round result, score, final alert
+    └── resetCounters.js        — shared utility to reset all game state
 ```
 
 ---
 
-## Step di sviluppo
+## Development Steps
 
-- [x] **Setup** — Vite + React, pulizia file default
-- [x] **`possibilities.js`** — array di oggetti `{ id, label, src }` per rock, paper, scissors (+ `start` per lo stato iniziale)
-- [x] **`rules.js`** — oggetto mappa delle regole del gioco (`rock` batte `scissors`, ecc.)
-- [x] **`Chooser`** — bottoni immagine generati con `.map()` sull'array filtrato `userWeapons`; estrazione casuale CPU; `calcResult` funzione pura
-- [x] **`Matcher`** — confronto visivo (immagini via `imageShow()`), risultato round, score e alert finale Bootstrap
-- [x] **Punteggio** — tracciamento score separato per giocatore e CPU (`score`, `cpuscore`)
-- [x] **Blocco partita** — bottoni disabilitati al termine dei 5 round (`disabled` condizionale)
-- [x] **Vincitore finale** — alert Bootstrap a 3 vie (`alert-success` / `alert-warning` / `alert-danger`) al termine dei round
-- [x] **Reset** — pulsante di riavvio al termine dei 5 round, ripristino di tutti gli stati
-- [x] **Refactoring** — stale state corretto con callback `prev =>`; `calcResult` resa funzione pura; `src` usato come unica fonte per i percorsi immagine
+- [x] **Setup** — Vite + React, default file cleanup
+- [x] **`possibilities.js`** — weapons array `{ id, label, src }` for rock, paper, scissors (+ `start` for initial state)
+- [x] **`rules.js`** — classic rules map (`rock` beats `scissors`, etc.)
+- [x] **`Chooser`** — image buttons generated with `.map()` on filtered `userWeapons`; random CPU pick; `calcResult` pure function
+- [x] **`Matcher`** — visual comparison (images via `imageShow()`), round result, score and final Bootstrap alert
+- [x] **Score tracking** — separate score for player and CPU (`score`, `cpuscore`)
+- [x] **Game lock** — buttons disabled after 5 rounds (conditional `disabled`)
+- [x] **Final winner** — 3-way Bootstrap alert (`alert-success` / `alert-warning` / `alert-danger`) at end of rounds
+- [x] **Reset** — restart button at end of 5 rounds, all state restored
+- [x] **Refactoring** — stale state fixed with `prev =>` callbacks; `calcResult` made pure; `src` as single source for image paths
+- [x] **Lizard-Spock mode** — 5-weapon variant with extended rules (`rulesAdvanced.js`) and new `in` operator–based win check
+- [x] **Game mode toggle** — custom Star Trek–styled button toggle in `App`, resets game on switch
+- [x] **Conditional image invert** — CSS class applied per mode to handle icon style differences
 
 ---
 
-## Concetti React applicati
+## React Concepts Applied
 
-| Concetto | Utilizzo |
+| Concept | Usage |
 |---|---|
-| **Props + destructuring** | setter passati ai componenti figli tramite props |
-| **`useState`** | punteggio, scelte, risultato e contatore nel componente padre |
-| **Lifting state up** | tutto lo stato vive in `App`, i figli ricevono getter e setter via props |
-| **Event handler** | `onClick` con arrow function per passare il valore direttamente |
-| **Rendering condizionale** | result e reset button mostrati solo quando necessario |
-| **`.map()` + `key`** | generazione dinamica dei bottoni da array filtrato |
-| **`.filter()` + `.find()`** | selezione armi giocatore e ricerca immagine per label |
-| **Funzione pura** | `calcResult` non ha side effect, ritorna un oggetto con risultato e punti |
-| **Stale state** | aggiornamenti accumulativi con callback `prev => prev + n` |
+| **Props + destructuring** | setters passed to child components via props |
+| **`useState`** | score, choices, result and round counter in parent component |
+| **Lifting state up** | all state lives in `App`, children receive getters and setters via props |
+| **Event handlers** | `onClick` with arrow function block `() => { ... }` for multi-statement handlers |
+| **Conditional rendering** | result and reset button shown only when needed |
+| **`.map()` + `key`** | dynamic button generation from filtered array |
+| **`.filter()` + `.find()`** | player weapon selection and image lookup by label |
+| **Pure function** | `calcResult` has no side effects, returns object with result and points |
+| **Stale state** | accumulative updates with `prev => prev + n` callback |
+| **Ternary in JSX** | conditional `className` for active state and mode-based styling |
+| **`in` operator** | used to check if opponent's weapon is in the winner's `wins` object |
+| **Shared utility** | `resetCounters.js` imported in both `App` and `Matcher` |
 
 ---
 
-## Tecnologie
+## Tech Stack
 
 ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white)
@@ -66,7 +79,7 @@ App.jsx
 
 ---
 
-## Corso
+## Course
 
-Progetto del percorso **[The Odin Project](https://www.theodinproject.com/)** — Foundations
-Sviluppato durante il bootcamp **[Boolean](https://boolean.co.uk/)** WDPT11
+Project from **[The Odin Project](https://www.theodinproject.com/)** — Foundations
+Built during the **[Boolean](https://boolean.co.uk/)** WDPT11 bootcamp
