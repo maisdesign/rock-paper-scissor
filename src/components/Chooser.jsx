@@ -8,7 +8,7 @@ function getRandomInt(max) {
 
 
 
-function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResult, setCpuScore, version }) {
+function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResult, setCpuScore, version, setSentence }) {
 
     const userWeapons = (version === 'classic') ? possibilities.filter(item => item.label !== 'start') : possibilitiesAdvanced.filter(item => item.label !== 'start');
 
@@ -18,9 +18,9 @@ function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResul
             if (rules[chosen] === picker) { return { result: 'Hai vinto', playerPoint: 1, cpuPoint: 0 } }
             else { return { result: 'Hai perso', playerPoint: 0, cpuPoint: 1 } };
         } else {
-            if (chosen === picker) { return { result: 'Parità', playerPoint: 0, cpuPoint: 0 } };
-            if (picker in rulesAdvanced[chosen].wins) { return { result: 'Hai vinto', playerPoint: 1, cpuPoint: 0 } }
-            else { return { result: 'Hai perso', playerPoint: 0, cpuPoint: 1 } };
+            if (chosen === picker) { return { result: 'Parità', playerPoint: 0, cpuPoint: 0, sentence: "It's a draw!" } };
+            if (picker in rulesAdvanced[chosen].wins) { return { result: 'Hai vinto', playerPoint: 1, cpuPoint: 0, sentence: rulesAdvanced[chosen].wins[picker] } }
+            else { return { result: 'Hai perso', playerPoint: 0, cpuPoint: 1, sentence: rulesAdvanced[picker].wins[chosen] } };
         };
     }
 
@@ -31,6 +31,7 @@ function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResul
         setMatches(prev => prev + 1);
         const outcome = calcResult(label, vestratto, version);
         setResult(outcome.result);
+        setSentence(outcome.sentence);
         setScore(prev => prev + outcome.playerPoint);
         setCpuScore(prev => prev + outcome.cpuPoint);
     }

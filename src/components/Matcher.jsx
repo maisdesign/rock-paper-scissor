@@ -6,7 +6,7 @@ function imageShow(array, value) {
     return image.src;
 }
 
-function Matcher({ score, matches, cpuscore, version, result, picker, chosen, setScore, setMatches, setPicker, setChosen, setResult, setCpuScore }) {
+function Matcher({ score, matches, cpuscore, version, result, picker, chosen, setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, sentence, setSentence }) {
 
     const imgSet = (version === 'classic') ? possibilities : possibilitiesAdvanced;
 
@@ -40,7 +40,7 @@ function Matcher({ score, matches, cpuscore, version, result, picker, chosen, se
                     <img className="choice-img" src={`/icons/${imageShow(imgSet, picker)}`} alt={picker} />
                 </div>
             </div>
-
+            {sentence && <p className="battle-sentence">{sentence}</p>}
             {result && <p className={`result-text fw-bold ${resultClass}`}>{result}</p>}
 
             <div className="score-section d-flex justify-content-center gap-5 rounded-3 p-3 mt-3">
@@ -66,7 +66,7 @@ function Matcher({ score, matches, cpuscore, version, result, picker, chosen, se
                             ? <div className="alert alert-warning" role="alert">Hai pareggiato</div>
                             : <div className="alert alert-danger" role="alert">Non hai vinto</div>
                     }
-                    <button className="reset-btn btn btn-info w-100" onClick={() => resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore)}>
+                    <button className="reset-btn btn btn-info w-100" onClick={() => resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence)}>
                         Riavvia gioco
                     </button>
                 </div>

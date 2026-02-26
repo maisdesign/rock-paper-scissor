@@ -143,6 +143,16 @@ button.weapon-btn.weapon-classic img {
   color: #e94560;
 }
 
+/* ── Battle sentence ── */
+.battle-sentence {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #c8a800;
+  letter-spacing: 0.04em;
+  margin: 0.75rem 0 0;
+  opacity: 0.9;
+}
+
 /* ── Result ── */
 .result-text {
   font-size: 1.75rem;
