@@ -15,7 +15,7 @@ function App() {
   const [version, setVersion] = useState('classic');
 
   return (
-    <div className="game-card">
+    <div className="game-card p-md-4 p-1">
       <h1 className="game-title">ROCK PAPER SCISSORS (LIZARD SPOCK?)</h1>
       <p className="game-subtitle">First choose your version of the game:</p>
       {/*}
