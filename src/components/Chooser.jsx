@@ -1,17 +1,27 @@
 import possibilities from '../data/possibilities.js'
+import possibilitiesAdvanced from '../data/possibilitiesAdvanced.js'
 import rules from '../data/rules.js'
+import rulesAdvanced from '../data/rulesAdvanced.js'
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
-const userWeapons = possibilities.filter(item => item.label !== 'start');
 
 
-function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResult, setCpuScore }) {
 
-    function calcResult(chosen, picker) {
-        if (chosen === picker) { return { result: 'Parità', playerPoint: 0, cpuPoint: 0 } };
-        if (rules[chosen] === picker) { return { result: 'Hai vinto', playerPoint: 1, cpuPoint: 0 } }
-        else { return { result: 'Hai perso', playerPoint: 0, cpuPoint: 1 } };
+function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResult, setCpuScore, version }) {
+
+    const userWeapons = (version === 'classic') ? possibilities.filter(item => item.label !== 'start') : possibilitiesAdvanced.filter(item => item.label !== 'start');
+
+    function calcResult(chosen, picker, version) {
+        if (version === 'classic') {
+            if (chosen === picker) { return { result: 'Parità', playerPoint: 0, cpuPoint: 0 } };
+            if (rules[chosen] === picker) { return { result: 'Hai vinto', playerPoint: 1, cpuPoint: 0 } }
+            else { return { result: 'Hai perso', playerPoint: 0, cpuPoint: 1 } };
+        } else {
+            if (chosen === picker) { return { result: 'Parità', playerPoint: 0, cpuPoint: 0 } };
+            if (picker in rulesAdvanced[chosen].wins) { return { result: 'Hai vinto', playerPoint: 1, cpuPoint: 0 } }
+            else { return { result: 'Hai perso', playerPoint: 0, cpuPoint: 1 } };
+        };
     }
 
     function handleSubmit(label) {
@@ -19,7 +29,7 @@ function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResul
         setChosen(label);
         setPicker(vestratto);
         setMatches(prev => prev + 1);
-        const outcome = calcResult(label, vestratto);
+        const outcome = calcResult(label, vestratto, version);
         setResult(outcome.result);
         setScore(prev => prev + outcome.playerPoint);
         setCpuScore(prev => prev + outcome.cpuPoint);
@@ -28,7 +38,7 @@ function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResul
         <span className="chooser-label text-uppercase small fw-semibold">Scegli la tua arma</span>
         <div className="d-flex justify-content-center gap-4 mt-3">
             {userWeapons.map(({ id, label, src }) =>
-                <button key={id} className="weapon-btn" onClick={() => handleSubmit(label)} disabled={matches >= 5}>
+                <button key={id} className={"weapon-btn" + (version === 'classic' ? " weapon-classic" : " weapon-advanced")} onClick={() => handleSubmit(label, version)} disabled={matches >= 5}>
                     <img src={`/icons/${src}`} alt={label} />
                 </button>)
             }
