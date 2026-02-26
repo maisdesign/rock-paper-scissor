@@ -36,7 +36,7 @@ function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResul
     }
     return <>
         <span className="chooser-label text-uppercase small fw-semibold">Scegli la tua arma</span>
-        <div className="d-flex justify-content-center gap-4 mt-3">
+        <div className="d-flex justify-content-center gap-4 mt-3 flex-wrap">
             {userWeapons.map(({ id, label, src }) =>
                 <button key={id} className={"weapon-btn" + (version === 'classic' ? " weapon-classic" : " weapon-advanced")} onClick={() => handleSubmit(label, version)} disabled={matches >= 5}>
                     <img src={`/icons/${src}`} alt={label} />
