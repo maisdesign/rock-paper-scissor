@@ -14,13 +14,13 @@ function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResul
 
     function calcResult(chosen, picker, version) {
         if (version === 'classic') {
-            if (chosen === picker) { return { result: 'Parità', playerPoint: 0, cpuPoint: 0 } };
-            if (rules[chosen] === picker) { return { result: 'Hai vinto', playerPoint: 1, cpuPoint: 0 } }
-            else { return { result: 'Hai perso', playerPoint: 0, cpuPoint: 1 } };
+            if (chosen === picker) { return { result: 'Draw', playerPoint: 0, cpuPoint: 0 } };
+            if (rules[chosen] === picker) { return { result: 'You win', playerPoint: 1, cpuPoint: 0 } }
+            else { return { result: 'You lose', playerPoint: 0, cpuPoint: 1 } };
         } else {
-            if (chosen === picker) { return { result: 'Parità', playerPoint: 0, cpuPoint: 0, sentence: "It's a draw!" } };
-            if (picker in rulesAdvanced[chosen].wins) { return { result: 'Hai vinto', playerPoint: 1, cpuPoint: 0, sentence: rulesAdvanced[chosen].wins[picker] } }
-            else { return { result: 'Hai perso', playerPoint: 0, cpuPoint: 1, sentence: rulesAdvanced[picker].wins[chosen] } };
+            if (chosen === picker) { return { result: 'Draw', playerPoint: 0, cpuPoint: 0, sentence: "It's a draw!" } };
+            if (picker in rulesAdvanced[chosen].wins) { return { result: 'You win', playerPoint: 1, cpuPoint: 0, sentence: rulesAdvanced[chosen].wins[picker] } }
+            else { return { result: 'You lose', playerPoint: 0, cpuPoint: 1, sentence: rulesAdvanced[picker].wins[chosen] } };
         };
     }
 
@@ -36,7 +36,7 @@ function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResul
         setCpuScore(prev => prev + outcome.cpuPoint);
     }
     return <>
-        <span className="chooser-label text-uppercase small fw-semibold">Scegli la tua arma</span>
+        <span className="chooser-label text-uppercase small fw-semibold">Choose your weapon!</span>
         <div className="d-flex justify-content-center gap-4 mt-3 flex-wrap flex-md-nowrap">
             {userWeapons.map(({ id, label, src }) =>
                 <button key={id} className={"weapon-btn" + (version === 'classic' ? " weapon-classic" : " weapon-advanced")} onClick={() => handleSubmit(label, version)} disabled={matches >= 5}>

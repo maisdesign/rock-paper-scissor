@@ -45,7 +45,7 @@ App.jsx
 - [x] **Final winner** — 3-way Bootstrap alert (`alert-success` / `alert-warning` / `alert-danger`) at end of rounds
 - [x] **Reset** — restart button at end of 5 rounds, all state restored
 - [x] **Refactoring** — stale state fixed with `prev =>` callbacks; `calcResult` made pure; `src` as single source for image paths
-- [x] **Lizard-Spock mode** — 5-weapon variant with extended rules (`rulesAdvanced.js`) and new `in` operator–based win check
+- [x] **Lizard-Spock mode** — 5-weapon variant with extended rules (`rulesAdvanced.js`), `in` operator–based win check, and per-round battle sentence state (`sentence`)
 - [x] **Game mode toggle** — custom Star Trek–styled button toggle in `App`, resets game on switch
 - [x] **Conditional image invert** — CSS class applied per mode to handle icon style differences
 
