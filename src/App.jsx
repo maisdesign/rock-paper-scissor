@@ -64,6 +64,7 @@ function App() {
           return;
         }
         const { u1Weapon, u2Weapon, status } = payload.new
+        console.log('[SUB]', role, status, 'u1:', u1Weapon, 'u2:', u2Weapon)
         if (status === 'joined.u2' && role === 'u1') { setReady(true) }
         if (status?.startsWith('picking.')) {
           const myWeapon = role === 'u1' ? u1Weapon : u2Weapon
