@@ -79,7 +79,7 @@ function App() {
             .then(({ error, count }) => console.log('[SUB] result update done | err:', error, '| count:', count))
         }
         if (status === 'picking') { resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence); setChosenWeapon('') }
-        if (status === 'endRound') { setPicker('start'); setChosen('start'); setSentence(''); setResult(''); setChosenWeapon('') }
+        if (status === 'endRound') { console.log('[SUB] endRound handler! resetting UI'); setPicker('start'); setChosen('start'); setSentence(''); setResult(''); setChosenWeapon('') }
 
         if (status === 'result') {
           console.log('[SUB] result handler firing! role:', role, 'u1:', u1Weapon, 'u2:', u2Weapon)
@@ -93,12 +93,12 @@ function App() {
           setPicker(opponentWeapon)
           const outcome = calcResult(myWeapon, opponentWeapon, version)
           setTimeout(() => {
-
+            console.log('[APP] setTimeout fired → updating endRound')
             supaClient
               .from('sessions')
               .update({ u1Weapon: null, u2Weapon: null, status: 'endRound' })
               .eq('id', sessionId).eq('status', 'result')
-
+              .then(({ error }) => console.log('[APP] endRound update done, err:', error))
           }, 1000)
           setMatches(prev => prev + 1)
           setResult(outcome.result)
