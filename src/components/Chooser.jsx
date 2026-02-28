@@ -18,10 +18,14 @@ function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResul
         if (mode === 'multi') {
             const myField = role === 'u1' ? 'u1Weapon' : 'u2Weapon';
             const opponentField = role === 'u1' ? 'u2Weapon' : 'u1Weapon';
-            await supaClient.from('sessions').update({ [myField]: label }).eq('id', sessionId);
+            console.log('[C] picking', label, 'as', role);
+            const { error: wErr } = await supaClient.from('sessions').update({ [myField]: label, status: `picking.${role}` }).eq('id', sessionId);
+            console.log('[C] weapon+status updated, err:', wErr);
             setChosenWeapon(label);
-            const { data } = await supaClient.from('sessions').select(opponentField).eq('id', sessionId).single();
+            const { data, error: sErr } = await supaClient.from('sessions').select(opponentField).eq('id', sessionId).single();
+            console.log('[C] opponent weapon:', data?.[opponentField], 'err:', sErr);
             if (data?.[opponentField]) {
+                console.log('[C] triggering result from Chooser');
                 supaClient.from('sessions').update({ status: 'result' }).eq('id', sessionId).neq('status', 'result');
             }
         } else {
