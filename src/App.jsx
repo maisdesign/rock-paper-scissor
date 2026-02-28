@@ -64,25 +64,20 @@ function App() {
           return;
         }
         const { u1Weapon, u2Weapon, status } = payload.new
-        console.log('[SUB]', role, status, '| u1:', u1Weapon, '| u2:', u2Weapon)
         if (status === 'joined.u2' && role === 'u1') { setReady(true) }
         if (status?.startsWith('picking.')) {
           const myWeapon = role === 'u1' ? u1Weapon : u2Weapon
           if (!myWeapon) {
-            console.log('[SUB] new round detected, resetting UI')
             setPicker('start'); setChosen('start'); setSentence(''); setResult(''); setChosenWeapon('')
           }
         }
         if (u1Weapon && u2Weapon && status !== 'result') {
-          console.log('[SUB] both picked! triggering result')
           supaClient.from('sessions').update({ status: 'result' }).eq('id', sessionId).eq('status', status)
-            .then(({ error, count }) => console.log('[SUB] result update done | err:', error, '| count:', count))
         }
         if (status === 'picking') { resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence); setChosenWeapon('') }
-        if (status === 'endRound') { console.log('[SUB] endRound handler! resetting UI'); setPicker('start'); setChosen('start'); setSentence(''); setResult(''); setChosenWeapon('') }
+        if (status === 'endRound') { setPicker('start'); setChosen('start'); setSentence(''); setResult(''); setChosenWeapon('') }
 
         if (status === 'result') {
-          console.log('[SUB] result handler firing! role:', role, 'u1:', u1Weapon, 'u2:', u2Weapon)
           let myWeapon, opponentWeapon
           if (role === 'u1') {
             myWeapon = u1Weapon; opponentWeapon = u2Weapon
@@ -93,12 +88,10 @@ function App() {
           setPicker(opponentWeapon)
           const outcome = calcResult(myWeapon, opponentWeapon, version)
           setTimeout(() => {
-            console.log('[APP] setTimeout fired → updating endRound')
             supaClient
               .from('sessions')
               .update({ u1Weapon: null, u2Weapon: null, status: 'endRound' })
               .eq('id', sessionId).eq('status', 'result')
-              .then(({ error }) => console.log('[APP] endRound update done, err:', error))
           }, 1000)
           setMatches(prev => prev + 1)
           setResult(outcome.result)
