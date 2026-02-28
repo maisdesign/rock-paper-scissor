@@ -16,11 +16,14 @@ function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResul
 
     async function handleSubmit(label) {
         if (mode === 'multi') {
-            await supaClient
-                .from('sessions')
-                .update({ [role === 'u1' ? 'u1Weapon' : 'u2Weapon']: label })
-                .eq('id', sessionId);
+            const myField = role === 'u1' ? 'u1Weapon' : 'u2Weapon';
+            const opponentField = role === 'u1' ? 'u2Weapon' : 'u1Weapon';
+            await supaClient.from('sessions').update({ [myField]: label }).eq('id', sessionId);
             setChosenWeapon(label);
+            const { data } = await supaClient.from('sessions').select(opponentField).eq('id', sessionId).single();
+            if (data?.[opponentField]) {
+                supaClient.from('sessions').update({ status: 'result' }).eq('id', sessionId).neq('status', 'result');
+            }
         } else {
             const vestratto = userWeapons[getRandomInt(userWeapons.length)].label;
             setChosen(label);

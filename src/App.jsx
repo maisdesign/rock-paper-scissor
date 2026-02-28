@@ -65,7 +65,7 @@ function App() {
         }
         const { u1Weapon, u2Weapon, status } = payload.new
         if (status === 'joined.u2' && role === 'u1') { setReady(true) }
-        if (u1Weapon && u2Weapon && status !== 'result' && role === 'u1') {
+        if (u1Weapon && u2Weapon && status !== 'result') {
           supaClient.from('sessions').update({ status: 'result' }).eq('id', sessionId).eq('status', status)
         }
         if (status === 'picking') { resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence); setChosenWeapon('') }
