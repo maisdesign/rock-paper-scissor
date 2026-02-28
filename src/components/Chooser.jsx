@@ -10,30 +10,16 @@ function getRandomInt(max) {
 
 
 
-function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResult, setCpuScore, version, setSentence, sessionId, role, mode, picked, setChosenWeapon, chosenWeapon }) {
+function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResult, setCpuScore, version, setSentence, sessionId, role, mode, setChosenWeapon, chosenWeapon }) {
 
     const userWeapons = (version === 'classic') ? possibilities.filter(item => item.label !== 'start') : possibilitiesAdvanced.filter(item => item.label !== 'start');
 
     async function handleSubmit(label) {
         if (mode === 'multi') {
-            if (picked) {
-                await supaClient
-                    .from('sessions')
-                    .update({ [role === 'u1' ? 'u1Weapon' : 'u2Weapon']: label, status: 'result' })
-                    .eq('id', sessionId);
-            } else {
-                if (role === 'u1') {
-                    await supaClient
-                        .from('sessions')
-                        .update({ u1Weapon: label, status: 'picking.u1' })
-                        .eq('id', sessionId)
-                } else if (role === 'u2') {
-                    await supaClient
-                        .from('sessions')
-                        .update({ u2Weapon: label, status: 'picking.u2' })
-                        .eq('id', sessionId)
-                }
-            }
+            await supaClient
+                .from('sessions')
+                .update({ [role === 'u1' ? 'u1Weapon' : 'u2Weapon']: label })
+                .eq('id', sessionId);
             setChosenWeapon(label);
         } else {
             const vestratto = userWeapons[getRandomInt(userWeapons.length)].label;

@@ -19,7 +19,6 @@ function App() {
   const [mode, setMode] = useState(new URLSearchParams(window.location.search).has('join') ? 'multi' : 'single')
   const [sessionId, setSessionId] = useState('');
   const [role, setRole] = useState('');
-  const [picked, setPicked] = useState('');
   const [ready, setReady] = useState(false);
   const [sessionEnded, setSessionEnded] = useState(false);
   const [chosenWeapon, setChosenWeapon] = useState('')
@@ -29,7 +28,6 @@ function App() {
     setSessionId('');
     setRole('');
     setReady(false);
-    setPicked('');
     setChosenWeapon('');
     resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence);
   }
@@ -37,7 +35,7 @@ function App() {
   async function handleReset() {
 
     resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence);
-    setPicked('');
+    setChosenWeapon('');
     if (mode === 'multi') {
 
       await supaClient
@@ -60,17 +58,18 @@ function App() {
         filter: `id=eq.${sessionId}`
       }, (payload) => {
         if (payload.eventType === 'DELETE') {
-          setSessionId(''); setRole(''); setReady(false); setPicked(''); setChosenWeapon('');
+          setSessionId(''); setRole(''); setReady(false); setChosenWeapon('');
           setSessionEnded(true);
           resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence);
           return;
         }
         const { u1Weapon, u2Weapon, status } = payload.new
-        if (status === 'picking.u1' && role === 'u2') { setPicked(u1Weapon) }
-        if (status === 'picking.u2' && role === 'u1') { setPicked(u2Weapon) }
         if (status === 'joined.u2' && role === 'u1') { setReady(true) }
-        if (status === 'picking') { resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence); setPicked(''); setChosenWeapon('') }
-        if (status === 'endRound') { setPicker('start'); setPicked(''); setChosen('start'); setSentence(''); setResult(''); setChosenWeapon('') }
+        if (u1Weapon && u2Weapon && status !== 'result' && role === 'u1') {
+          supaClient.from('sessions').update({ status: 'result' }).eq('id', sessionId).eq('status', status)
+        }
+        if (status === 'picking') { resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence); setChosenWeapon('') }
+        if (status === 'endRound') { setPicker('start'); setChosen('start'); setSentence(''); setResult(''); setChosenWeapon('') }
 
         if (status === 'result') {
           let myWeapon, opponentWeapon
@@ -82,7 +81,6 @@ function App() {
           setChosen(myWeapon)
           setPicker(opponentWeapon)
           const outcome = calcResult(myWeapon, opponentWeapon, version)
-          setPicked('');
           setTimeout(() => {
 
             supaClient
@@ -138,7 +136,7 @@ function App() {
           {version === 'advanced' && <details><summary>How to play</summary><img className="schema-img my-1" src="/icons/schema.png" alt="How to play" /></details>}
 
           <p className="game-subtitle">Then choose your weapon</p>
-          <Chooser setChosen={setChosen} setPicker={setPicker} setScore={setScore} matches={matches} setMatches={setMatches} setResult={setResult} setCpuScore={setCpuScore} version={version} setSentence={setSentence} sessionId={sessionId} role={role} mode={mode} picked={picked} setChosenWeapon={setChosenWeapon} chosenWeapon={chosenWeapon} />
+          <Chooser setChosen={setChosen} setPicker={setPicker} setScore={setScore} matches={matches} setMatches={setMatches} setResult={setResult} setCpuScore={setCpuScore} version={version} setSentence={setSentence} sessionId={sessionId} role={role} mode={mode} setChosenWeapon={setChosenWeapon} chosenWeapon={chosenWeapon} />
           <Matcher score={score} matches={matches} result={result} picker={picker} chosen={chosen} cpuscore={cpuscore} version={version} sentence={sentence} handleReset={handleReset} mode={mode} />
         </div>
       }

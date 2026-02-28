@@ -25,7 +25,7 @@ function Matcher({ score, matches, cpuscore, version, result, picker, chosen, se
                 <span className="vs-badge fw-black">VS</span>
                 <div className="d-flex flex-column align-items-center gap-2">
                     <span className="player-label text-uppercase small">{mode === 'multi' ? 'Human 2' : 'CPU'}</span>
-                    <img className="choice-img" src={`/icons/${imageShow(imgSet, picker)}`} alt={picker} />
+                    <img className={"choice-img" + ((version === 'classic') ? " choice-classic" : "")} src={`/icons/${imageShow(imgSet, picker)}`} alt={picker} />
                 </div>
             </div>
             {sentence && <p className="battle-sentence">{sentence}</p>}
