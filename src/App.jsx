@@ -16,7 +16,7 @@ function App() {
   const [result, setResult] = useState('');
   const [version, setVersion] = useState('classic');
   const [sentence, setSentence] = useState('');
-  const [mode, setMode] = useState('single')
+  const [mode, setMode] = useState(new URLSearchParams(window.location.search).has('join') ? 'multi' : 'single')
   const [sessionId, setSessionId] = useState('');
   const [role, setRole] = useState('');
   const [picked, setPicked] = useState('');

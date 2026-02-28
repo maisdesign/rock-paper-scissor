@@ -464,3 +464,42 @@ button.weapon-btn.weapon-classic img {
   background: #06d6a0;
   color: #0f0e17;
 }
+
+/* ── Share buttons ── */
+.share-buttons-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.share-btn {
+  display: inline-block;
+  padding: 0.4rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.share-wa {
+  background: #25d366;
+  color: #fff;
+}
+
+.share-wa:hover {
+  background: #1ebe5a;
+  color: #fff;
+}
+
+.share-tg {
+  background: #229ed9;
+  color: #fff;
+}
+
+.share-tg:hover {
+  background: #1a8fc4;
+  color: #fff;
+}
