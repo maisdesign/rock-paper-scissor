@@ -10,7 +10,7 @@ function getRandomInt(max) {
 
 
 
-function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResult, setCpuScore, version, setSentence, sessionId, role, mode, picked }) {
+function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResult, setCpuScore, version, setSentence, sessionId, role, mode, picked, setChosenWeapon, chosenWeapon }) {
 
     const userWeapons = (version === 'classic') ? possibilities.filter(item => item.label !== 'start') : possibilitiesAdvanced.filter(item => item.label !== 'start');
 
@@ -20,7 +20,7 @@ function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResul
                 await supaClient
                     .from('sessions')
                     .update({ [role === 'u1' ? 'u1Weapon' : 'u2Weapon']: label, status: 'result' })
-                    .eq('id', sessionId)
+                    .eq('id', sessionId);
             } else {
                 if (role === 'u1') {
                     await supaClient
@@ -34,6 +34,7 @@ function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResul
                         .eq('id', sessionId)
                 }
             }
+            setChosenWeapon(label);
         } else {
             const vestratto = userWeapons[getRandomInt(userWeapons.length)].label;
             setChosen(label);
@@ -49,9 +50,14 @@ function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResul
 
     return <>
         <span className="chooser-label text-uppercase small fw-semibold">Choose your weapon!</span>
+        {mode === 'multi' && matches < GAME_MATCHES_COUNTER && (
+            <div className={`status-indicator ${chosenWeapon ? 'status-yellow' : 'status-green'}`}>
+                {chosenWeapon ? 'Waiting for opponent...' : 'Your turn! Pick your weapon'}
+            </div>
+        )}
         <div className="d-flex justify-content-center gap-4 mt-3 flex-wrap flex-md-nowrap">
             {userWeapons.map(({ id, label, src }) =>
-                <button key={id} className={"weapon-btn" + (version === 'classic' ? " weapon-classic" : " weapon-advanced")} onClick={() => handleSubmit(label)} disabled={matches >= GAME_MATCHES_COUNTER}>
+                <button key={id} className={"weapon-btn" + (version === 'classic' ? " weapon-classic" : " weapon-advanced") + (label === chosenWeapon ? " weapon-selected" : "")} onClick={() => handleSubmit(label)} disabled={matches >= GAME_MATCHES_COUNTER || (mode === 'multi' && !!chosenWeapon)}>
                     <img src={`/icons/${src}`} alt={label} />
                 </button>)
             }

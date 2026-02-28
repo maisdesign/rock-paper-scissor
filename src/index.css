@@ -82,6 +82,13 @@ body {
   cursor: not-allowed;
 }
 
+.weapon-btn.weapon-selected {
+  border-color: #06d6a0;
+  background: #06d6a0;
+  box-shadow: 0 0 22px rgba(6, 214, 160, 0.5);
+  transform: scale(1.12);
+}
+
 .weapon-btn:hover {
   border-color: #e94560;
   background: #e94560;
@@ -463,6 +470,30 @@ button.weapon-btn.weapon-classic img {
 .copy-btn.copied {
   background: #06d6a0;
   color: #0f0e17;
+}
+
+/* ── Status indicator ── */
+.status-indicator {
+  display: inline-block;
+  margin: 0.5rem auto 0;
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.status-green {
+  background: rgba(6, 214, 160, 0.15);
+  color: #06d6a0;
+  border: 1px solid #06d6a0;
+}
+
+.status-yellow {
+  background: rgba(255, 209, 102, 0.15);
+  color: #ffd166;
+  border: 1px solid #ffd166;
 }
 
 /* ── Share buttons ── */

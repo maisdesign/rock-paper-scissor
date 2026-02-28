@@ -22,6 +22,7 @@ function App() {
   const [picked, setPicked] = useState('');
   const [ready, setReady] = useState(false);
   const [sessionEnded, setSessionEnded] = useState(false);
+  const [chosenWeapon, setChosenWeapon] = useState('')
 
   async function handleLeave() {
     await supaClient.from('sessions').delete().eq('id', sessionId)
@@ -29,6 +30,7 @@ function App() {
     setRole('');
     setReady(false);
     setPicked('');
+    setChosenWeapon('');
     resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence);
   }
 
@@ -58,7 +60,7 @@ function App() {
         filter: `id=eq.${sessionId}`
       }, (payload) => {
         if (payload.eventType === 'DELETE') {
-          setSessionId(''); setRole(''); setReady(false); setPicked('');
+          setSessionId(''); setRole(''); setReady(false); setPicked(''); setChosenWeapon('');
           setSessionEnded(true);
           resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence);
           return;
@@ -67,8 +69,8 @@ function App() {
         if (status === 'picking.u1' && role === 'u2') { setPicked(u1Weapon) }
         if (status === 'picking.u2' && role === 'u1') { setPicked(u2Weapon) }
         if (status === 'joined.u2' && role === 'u1') { setReady(true) }
-        if (status === 'picking') { resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence); setPicked('') }
-        if (status === 'endRound') { setPicker('start'); setPicked(''); setChosen('start'); setSentence(''); setResult('') }
+        if (status === 'picking') { resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence); setPicked(''); setChosenWeapon('') }
+        if (status === 'endRound') { setPicker('start'); setPicked(''); setChosen('start'); setSentence(''); setResult(''); setChosenWeapon('') }
 
         if (status === 'result') {
           let myWeapon, opponentWeapon
@@ -136,7 +138,7 @@ function App() {
           {version === 'advanced' && <details><summary>How to play</summary><img className="schema-img my-1" src="/icons/schema.png" alt="How to play" /></details>}
 
           <p className="game-subtitle">Then choose your weapon</p>
-          <Chooser setChosen={setChosen} setPicker={setPicker} setScore={setScore} matches={matches} setMatches={setMatches} setResult={setResult} setCpuScore={setCpuScore} version={version} setSentence={setSentence} sessionId={sessionId} role={role} mode={mode} picked={picked} />
+          <Chooser setChosen={setChosen} setPicker={setPicker} setScore={setScore} matches={matches} setMatches={setMatches} setResult={setResult} setCpuScore={setCpuScore} version={version} setSentence={setSentence} sessionId={sessionId} role={role} mode={mode} picked={picked} setChosenWeapon={setChosenWeapon} chosenWeapon={chosenWeapon} />
           <Matcher score={score} matches={matches} result={result} picker={picker} chosen={chosen} cpuscore={cpuscore} version={version} sentence={sentence} handleReset={handleReset} mode={mode} />
         </div>
       }
