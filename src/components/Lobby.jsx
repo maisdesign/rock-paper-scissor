@@ -27,14 +27,15 @@ function Lobby({ setSessionId, setRole, sessionId, setReady, version, setVersion
             </div>
         ) :
             <div className="lobby-container">
-                <form onSubmit={e => e.preventDefault()}>
+                <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    const { data, error } = await supaClient.from('sessions').select().eq('id', inputCode).single()
+                    if (data) { setRole('u2'); setReady(true); setVersion(data.version); setSessionId(inputCode); setSessionEnded(false); await supaClient.from('sessions').update({ status: 'joined.u2' }).eq('id', inputCode) }
+                    if (error) { setErrorState("We couldn't find a session, please check again") }
+                }}>
                     <label htmlFor="insertSessionId" className="lobby-join-label">Have a code? Enter it here</label>
-                    <input type="text" className="lobby-input" id="insertSessionId" placeholder="Paste your friend's code..." value={inputCode} onChange={e => setInputCode(e.target.value)} />
-                    <button type="submit" className="lobby-submit-btn" onClick={async () => {
-                        const { data, error } = await supaClient.from('sessions').select().eq('id', inputCode).single()
-                        if (data) { setRole('u2'); setReady(true); setVersion(data.version); setSessionId(inputCode); setSessionEnded(false); await supaClient.from('sessions').update({ status: 'joined.u2' }).eq('id', inputCode) }
-                        if (error) { setErrorState("We couldn't find a session, please check again") }
-                    }}>Join session</button>
+                    <input type="text" className="lobby-input" id="insertSessionId" placeholder="Paste your friend's code..." value={inputCode} onChange={e => { setInputCode(e.target.value); setErrorState('') }} />
+                    <button type="submit" className="lobby-submit-btn">Join session</button>
                 </form>
                 {errorState && <p className="lobby-error">{errorState}</p>}
                 {sessionEnded && <p className="session-ended-msg">Session ended.</p>}

@@ -1,6 +1,8 @@
 import possibilities from '../data/possibilities.js'
 import possibilitiesAdvanced from '../data/possibilitiesAdvanced.js'
 import { supaClient } from '../lib/supabase.js'
+import calcResult from './calcResult.js'
+import { GAME_MATCHES_COUNTER } from '../data/configGame.js'
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
@@ -8,7 +10,7 @@ function getRandomInt(max) {
 
 
 
-function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResult, setCpuScore, version, setSentence, sessionId, role, mode, calcResult, picked }) {
+function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResult, setCpuScore, version, setSentence, sessionId, role, mode, picked }) {
 
     const userWeapons = (version === 'classic') ? possibilities.filter(item => item.label !== 'start') : possibilitiesAdvanced.filter(item => item.label !== 'start');
 
@@ -49,7 +51,7 @@ function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResul
         <span className="chooser-label text-uppercase small fw-semibold">Choose your weapon!</span>
         <div className="d-flex justify-content-center gap-4 mt-3 flex-wrap flex-md-nowrap">
             {userWeapons.map(({ id, label, src }) =>
-                <button key={id} className={"weapon-btn" + (version === 'classic' ? " weapon-classic" : " weapon-advanced")} onClick={() => handleSubmit(label, version)} disabled={matches >= 5}>
+                <button key={id} className={"weapon-btn" + (version === 'classic' ? " weapon-classic" : " weapon-advanced")} onClick={() => handleSubmit(label)} disabled={matches >= GAME_MATCHES_COUNTER}>
                     <img src={`/icons/${src}`} alt={label} />
                 </button>)
             }

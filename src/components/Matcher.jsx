@@ -1,11 +1,12 @@
 import possibilities from '../data/possibilities.js'
 import possibilitiesAdvanced from '../data/possibilitiesAdvanced.js'
+import { GAME_MATCHES_COUNTER } from '../data/configGame.js'
 function imageShow(array, value) {
     const image = array.find(item => item.label === value);
     return image.src;
 }
 
-function Matcher({ score, matches, cpuscore, version, result, picker, chosen, sentence, handleReset }) {
+function Matcher({ score, matches, cpuscore, version, result, picker, chosen, sentence, handleReset, mode }) {
 
     const imgSet = (version === 'classic') ? possibilities : possibilitiesAdvanced;
     const resultClass = result === 'You win'
@@ -23,7 +24,7 @@ function Matcher({ score, matches, cpuscore, version, result, picker, chosen, se
                 </div>
                 <span className="vs-badge fw-black">VS</span>
                 <div className="d-flex flex-column align-items-center gap-2">
-                    <span className="player-label text-uppercase small">CPU</span>
+                    <span className="player-label text-uppercase small">{mode === 'multi' ? 'Human 2' : 'CPU'}</span>
                     <img className="choice-img" src={`/icons/${imageShow(imgSet, picker)}`} alt={picker} />
                 </div>
             </div>
@@ -40,12 +41,12 @@ function Matcher({ score, matches, cpuscore, version, result, picker, chosen, se
                     <div className="score-label text-uppercase small">Matches</div>
                 </div>
                 <div className="text-center">
-                    <div className="score-number fw-bold">5</div>
+                    <div className="score-number fw-bold">{GAME_MATCHES_COUNTER}</div>
                     <div className="score-label text-uppercase small">Round</div>
                 </div>
             </div>
 
-            {matches >= 5 && (
+            {matches >= GAME_MATCHES_COUNTER && (
                 <div className="mt-3">
                     {score > cpuscore
                         ? <div className="alert alert-success" role="alert">You win!</div>

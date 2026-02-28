@@ -34,6 +34,3 @@ const rulesAdvanced =
 }
 
 export default rulesAdvanced
-
-
-//if (picker in rulesAdvanced[chosen].wins) =>
