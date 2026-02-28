@@ -69,11 +69,13 @@ function App() {
         if (u1Weapon && u2Weapon && status !== 'result') {
           console.log('[SUB] both picked! triggering result')
           supaClient.from('sessions').update({ status: 'result' }).eq('id', sessionId).eq('status', status)
+            .then(({ error, count }) => console.log('[SUB] result update done | err:', error, '| count:', count))
         }
         if (status === 'picking') { resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence); setChosenWeapon('') }
         if (status === 'endRound') { setPicker('start'); setChosen('start'); setSentence(''); setResult(''); setChosenWeapon('') }
 
         if (status === 'result') {
+          console.log('[SUB] result handler firing! role:', role, 'u1:', u1Weapon, 'u2:', u2Weapon)
           let myWeapon, opponentWeapon
           if (role === 'u1') {
             myWeapon = u1Weapon; opponentWeapon = u2Weapon
