@@ -148,6 +148,7 @@ function App() {
               resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence)
             }} disabled={mode === 'multi'}>Advanced <img src="/icons/phaser32.png" alt="phaser" /></button>
           </div>
+          {version === 'advanced' && <details><summary>How to play</summary><img className="schema-img my-1" src="/icons/schema.png" /></details>}
 
           <p className="game-subtitle">Then choose your weapon</p>
           <Chooser setChosen={setChosen} setPicker={setPicker} setScore={setScore} matches={matches} setMatches={setMatches} setResult={setResult} setCpuScore={setCpuScore} version={version} sentence={sentence} setSentence={setSentence} sessionId={sessionId} role={role} mode={mode} picked={picked} setPicked={setPicked} calcResult={calcResult} />

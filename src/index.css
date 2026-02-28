@@ -53,6 +53,10 @@ body {
   margin-bottom: 1.25rem;
 }
 
+.schema-img {
+  max-width: 80%;
+}
+
 .weapons-row {
   display: flex;
   justify-content: center;
