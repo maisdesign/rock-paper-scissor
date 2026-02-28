@@ -48,6 +48,7 @@ function App() {
   }
 
   async function handleReset() {
+
     resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence);
     setPicked('');
     if (mode === 'multi') {
@@ -57,6 +58,7 @@ function App() {
         .update({ u1Weapon: null, u2Weapon: null, status: 'picking' })
         .eq('id', sessionId)
     }
+
   }
 
   useEffect(() => {
@@ -81,6 +83,7 @@ function App() {
         if (status === 'picking.u2' && role === 'u1') { setPicked(u2Weapon) }
         if (status === 'joined.u2' && role === 'u1') { setReady(true) }
         if (status === 'picking') { resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence); setPicked('') }
+        if (status === 'endRound') { setPicker('start'), setPicked(''), setChosen('start'), setSentence(''), setResult('') }
 
         if (status === 'result') {
           let myWeapon, opponentWeapon
@@ -92,6 +95,15 @@ function App() {
           setChosen(myWeapon)
           setPicker(opponentWeapon)
           const outcome = calcResult(myWeapon, opponentWeapon, version)
+          setPicked('');
+          setTimeout(() => {
+            if (role === 'u1') {
+              supaClient
+                .from('sessions')
+                .update({ u1Weapon: null, u2Weapon: null, status: 'endRound' })
+                .eq('id', sessionId)
+            }
+          }, 1000)
           setMatches(prev => prev + 1)
           setResult(outcome.result)
           setSentence(outcome.sentence)
