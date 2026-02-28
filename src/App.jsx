@@ -66,6 +66,13 @@ function App() {
         const { u1Weapon, u2Weapon, status } = payload.new
         console.log('[SUB]', role, status, '| u1:', u1Weapon, '| u2:', u2Weapon)
         if (status === 'joined.u2' && role === 'u1') { setReady(true) }
+        if (status?.startsWith('picking.')) {
+          const myWeapon = role === 'u1' ? u1Weapon : u2Weapon
+          if (!myWeapon) {
+            console.log('[SUB] new round detected, resetting UI')
+            setPicker('start'); setChosen('start'); setSentence(''); setResult(''); setChosenWeapon('')
+          }
+        }
         if (u1Weapon && u2Weapon && status !== 'result') {
           console.log('[SUB] both picked! triggering result')
           supaClient.from('sessions').update({ status: 'result' }).eq('id', sessionId).eq('status', status)
