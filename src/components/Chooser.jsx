@@ -1,40 +1,50 @@
 import possibilities from '../data/possibilities.js'
 import possibilitiesAdvanced from '../data/possibilitiesAdvanced.js'
-import rules from '../data/rules.js'
-import rulesAdvanced from '../data/rulesAdvanced.js'
+import { supaClient } from '../lib/supabase.js'
+
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
 
 
 
-function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResult, setCpuScore, version, setSentence }) {
+function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResult, setCpuScore, version, setSentence, sessionId, role, mode, calcResult, picked }) {
 
     const userWeapons = (version === 'classic') ? possibilities.filter(item => item.label !== 'start') : possibilitiesAdvanced.filter(item => item.label !== 'start');
 
-    function calcResult(chosen, picker, version) {
-        if (version === 'classic') {
-            if (chosen === picker) { return { result: 'Draw', playerPoint: 0, cpuPoint: 0 } };
-            if (rules[chosen] === picker) { return { result: 'You win', playerPoint: 1, cpuPoint: 0 } }
-            else { return { result: 'You lose', playerPoint: 0, cpuPoint: 1 } };
+    async function handleSubmit(label) {
+        if (mode === 'multi') {
+            if (picked) {
+                await supaClient
+                    .from('sessions')
+                    .update({ [role === 'u1' ? 'u1Weapon' : 'u2Weapon']: label, status: 'result' })
+                    .eq('id', sessionId)
+            } else {
+                if (role === 'u1') {
+                    await supaClient
+                        .from('sessions')
+                        .update({ u1Weapon: label, status: 'picking.u1' })
+                        .eq('id', sessionId)
+                } else if (role === 'u2') {
+                    await supaClient
+                        .from('sessions')
+                        .update({ u2Weapon: label, status: 'picking.u2' })
+                        .eq('id', sessionId)
+                }
+            }
         } else {
-            if (chosen === picker) { return { result: 'Draw', playerPoint: 0, cpuPoint: 0, sentence: "It's a draw!" } };
-            if (picker in rulesAdvanced[chosen].wins) { return { result: 'You win', playerPoint: 1, cpuPoint: 0, sentence: rulesAdvanced[chosen].wins[picker] } }
-            else { return { result: 'You lose', playerPoint: 0, cpuPoint: 1, sentence: rulesAdvanced[picker].wins[chosen] } };
-        };
+            const vestratto = userWeapons[getRandomInt(userWeapons.length)].label;
+            setChosen(label);
+            setPicker(vestratto);
+            const outcome = calcResult(label, vestratto, version);
+            setMatches(prev => prev + 1);
+            setResult(outcome.result);
+            setSentence(outcome.sentence);
+            setScore(prev => prev + outcome.playerPoint);
+            setCpuScore(prev => prev + outcome.cpuPoint);
+        }
     }
 
-    function handleSubmit(label) {
-        const vestratto = userWeapons[getRandomInt(userWeapons.length)].label;
-        setChosen(label);
-        setPicker(vestratto);
-        setMatches(prev => prev + 1);
-        const outcome = calcResult(label, vestratto, version);
-        setResult(outcome.result);
-        setSentence(outcome.sentence);
-        setScore(prev => prev + outcome.playerPoint);
-        setCpuScore(prev => prev + outcome.cpuPoint);
-    }
     return <>
         <span className="chooser-label text-uppercase small fw-semibold">Choose your weapon!</span>
         <div className="d-flex justify-content-center gap-4 mt-3 flex-wrap flex-md-nowrap">

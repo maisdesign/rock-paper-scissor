@@ -1,26 +1,13 @@
 import possibilities from '../data/possibilities.js'
 import possibilitiesAdvanced from '../data/possibilitiesAdvanced.js'
-import resetCounters from './resetCounters.js'
 function imageShow(array, value) {
     const image = array.find(item => item.label === value);
     return image.src;
 }
 
-function Matcher({ score, matches, cpuscore, version, result, picker, chosen, setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, sentence, setSentence }) {
+function Matcher({ score, matches, cpuscore, version, result, picker, chosen, sentence, handleReset }) {
 
     const imgSet = (version === 'classic') ? possibilities : possibilitiesAdvanced;
-
-
-
-    /*function resetCounters() {
-        setScore(0);
-        setCpuScore(0);
-        setMatches(0);
-        setPicker('start');
-        setChosen('start');
-        setResult('');
-    }*/
-
     const resultClass = result === 'You win'
         ? 'result-win'
         : result === 'You lose'
@@ -66,7 +53,7 @@ function Matcher({ score, matches, cpuscore, version, result, picker, chosen, se
                             ? <div className="alert alert-warning" role="alert">It's a draw!</div>
                             : <div className="alert alert-danger" role="alert">You lose!</div>
                     }
-                    <button className="reset-btn btn btn-info w-100" onClick={() => resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence)}>
+                    <button className="reset-btn btn btn-info w-100" onClick={() => handleReset()}>
                         Play again
                     </button>
                 </div>

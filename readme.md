@@ -1,85 +1,95 @@
-# Rock Paper Scissors ✊✋✌️🦎🖖
+# Rock Paper Scissors (Lizard Spock?)
 
-> Project built as part of the **Boolean Web Development** bootcamp — JavaScript Functions module.
-> Extended version with **React + Vite** for component-based architecture practice.
+A browser-based Rock Paper Scissors game built with React and Supabase, featuring both single-player and real-time multiplayer modes.
 
----
+## Features
 
-## Description
-
-Rock Paper Scissors (with optional Lizard-Spock variant) played over **5 rounds** against the computer.
-The player chooses by clicking a weapon icon, the CPU picks randomly, and the result is calculated and displayed. At the end of 5 rounds the game can be restarted.
-
-Two game modes available:
-- **Classic** — Rock, Paper, Scissors
-- **Advanced** — Rock, Paper, Scissors, Lizard, Spock
-
----
-
-## Component Structure
-
-```
-App.jsx
-├── data/
-│   ├── possibilities.js        — weapons array { id, label, src } + 'start' entry
-│   ├── possibilitiesAdvanced.js — same with Lizard and Spock added
-│   ├── rules.js                — classic rules map (who beats whom)
-│   └── rulesAdvanced.js        — advanced rules map with wins object and flavor text
-└── components/
-    ├── Chooser.jsx             — weapon buttons, CPU pick, result calculation
-    ├── Matcher.jsx             — chosen images, round result, score, final alert
-    └── resetCounters.js        — shared utility to reset all game state
-```
-
----
-
-## Development Steps
-
-- [x] **Setup** — Vite + React, default file cleanup
-- [x] **`possibilities.js`** — weapons array `{ id, label, src }` for rock, paper, scissors (+ `start` for initial state)
-- [x] **`rules.js`** — classic rules map (`rock` beats `scissors`, etc.)
-- [x] **`Chooser`** — image buttons generated with `.map()` on filtered `userWeapons`; random CPU pick; `calcResult` pure function
-- [x] **`Matcher`** — visual comparison (images via `imageShow()`), round result, score and final Bootstrap alert
-- [x] **Score tracking** — separate score for player and CPU (`score`, `cpuscore`)
-- [x] **Game lock** — buttons disabled after 5 rounds (conditional `disabled`)
-- [x] **Final winner** — 3-way Bootstrap alert (`alert-success` / `alert-warning` / `alert-danger`) at end of rounds
-- [x] **Reset** — restart button at end of 5 rounds, all state restored
-- [x] **Refactoring** — stale state fixed with `prev =>` callbacks; `calcResult` made pure; `src` as single source for image paths
-- [x] **Lizard-Spock mode** — 5-weapon variant with extended rules (`rulesAdvanced.js`), `in` operator–based win check, and per-round battle sentence state (`sentence`)
-- [x] **Game mode toggle** — custom Star Trek–styled button toggle in `App`, resets game on switch
-- [x] **Conditional image invert** — CSS class applied per mode to handle icon style differences
-
----
-
-## React Concepts Applied
-
-| Concept | Usage |
-|---|---|
-| **Props + destructuring** | setters passed to child components via props |
-| **`useState`** | score, choices, result and round counter in parent component |
-| **Lifting state up** | all state lives in `App`, children receive getters and setters via props |
-| **Event handlers** | `onClick` with arrow function block `() => { ... }` for multi-statement handlers |
-| **Conditional rendering** | result and reset button shown only when needed |
-| **`.map()` + `key`** | dynamic button generation from filtered array |
-| **`.filter()` + `.find()`** | player weapon selection and image lookup by label |
-| **Pure function** | `calcResult` has no side effects, returns object with result and points |
-| **Stale state** | accumulative updates with `prev => prev + n` callback |
-| **Ternary in JSX** | conditional `className` for active state and mode-based styling |
-| **`in` operator** | used to check if opponent's weapon is in the winner's `wins` object |
-| **Shared utility** | `resetCounters.js` imported in both `App` and `Matcher` |
-
----
+- **Single Player** — play against a CPU opponent with instant results
+- **Multiplayer** — play in real time against a friend via a shared session code
+- **Two versions** — Classic (Rock Paper Scissors) and Advanced (Rock Paper Scissors Lizard Spock)
+- **Score tracking** — wins, losses and draws tracked over 5 rounds
+- **Session management** — generate a session, share the code, leave at any time
 
 ## Tech Stack
 
-![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=flat&logo=bootstrap&logoColor=white)
+- [React](https://react.dev/) — UI and state management
+- [Supabase](https://supabase.com/) — database and real-time subscriptions (Postgres + Realtime)
+- [Vite](https://vitejs.dev/) — build tool
+- [nanoid](https://github.com/ai/nanoid) — session ID generation
 
----
+## Getting Started
 
-## Course
+### Prerequisites
 
-Project from **[The Odin Project](https://www.theodinproject.com/)** — Foundations
-Built during the **[Boolean](https://boolean.co.uk/)** WDPT11 bootcamp
+- Node.js
+- A [Supabase](https://supabase.com/) project with a `sessions` table (see schema below)
+
+### Supabase Schema
+
+```sql
+create table sessions (
+  id text primary key,
+  u1Weapon text,
+  u2Weapon text,
+  status text default 'picking',
+  version text default 'classic'
+);
+```
+
+Enable Row Level Security and Realtime on the `sessions` table.
+
+### Installation
+
+```bash
+npm install
+```
+
+Create a `.env.local` file in the root:
+
+```
+VITE_URL=your_supabase_project_url
+VITE_ANON_KEY=your_supabase_anon_key
+```
+
+### Run locally
+
+```bash
+npm run dev
+```
+
+## How to Play
+
+### Single Player
+
+1. Select **Single** mode
+2. Choose a version (Classic or Advanced)
+3. Pick your weapon — the CPU picks randomly
+4. First to 5 rounds wins
+
+### Multiplayer
+
+1. Select **Multi** mode
+2. **Player 1** clicks **Generate your session ID** and shares the code
+3. **Player 2** enters the code and clicks **Join session**
+4. Both players pick their weapons — results are calculated in real time
+5. Click **Play again** to replay with the same session, or **✕** to leave
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── Chooser.jsx      # Weapon selection
+│   ├── Lobby.jsx        # Session creation and joining
+│   ├── Matcher.jsx      # Result display and score
+│   └── resetCounters.js # Shared reset utility
+├── data/
+│   ├── possibilities.js         # Classic weapons
+│   ├── possibilitiesAdvanced.js # Advanced weapons
+│   ├── rules.js                 # Classic win rules
+│   └── rulesAdvanced.js         # Advanced win rules with sentences
+├── lib/
+│   └── supabase.js      # Supabase client
+├── App.jsx
+└── index.css
+```

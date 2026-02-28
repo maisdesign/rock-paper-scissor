@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Matcher from './components/Matcher.jsx'
 import Chooser from './components/Chooser.jsx'
 import resetCounters from './components/resetCounters.js'
-
+import Lobby from './components/Lobby.jsx'
+import { supaClient } from './lib/supabase.js'
+import rules from './data/rules.js'
+import rulesAdvanced from './data/rulesAdvanced.js'
 
 function App() {
 
@@ -14,25 +17,131 @@ function App() {
   const [result, setResult] = useState('');
   const [version, setVersion] = useState('classic');
   const [sentence, setSentence] = useState('');
+  const [mode, setMode] = useState('single')
+  const [sessionId, setSessionId] = useState('');
+  const [role, setRole] = useState('');
+  const [picked, setPicked] = useState('');
+  const [ready, setReady] = useState(false);
+  const [sessionEnded, setSessionEnded] = useState(false);
+
+  function calcResult(chosen, picker, version) {
+
+    if (version === 'classic') {
+      if (chosen === picker) { return { result: 'Draw', playerPoint: 0, cpuPoint: 0 } };
+      if (rules[chosen] === picker) { return { result: 'You win', playerPoint: 1, cpuPoint: 0 } }
+      else { return { result: 'You lose', playerPoint: 0, cpuPoint: 1 } };
+    } else {
+      if (chosen === picker) { return { result: 'Draw', playerPoint: 0, cpuPoint: 0, sentence: "It's a draw!" } };
+      if (picker in rulesAdvanced[chosen].wins) { return { result: 'You win', playerPoint: 1, cpuPoint: 0, sentence: rulesAdvanced[chosen].wins[picker] } }
+      else { return { result: 'You lose', playerPoint: 0, cpuPoint: 1, sentence: rulesAdvanced[picker].wins[chosen] } };
+    };
+
+  };
+
+  async function handleLeave() {
+    await supaClient.from('sessions').delete().eq('id', sessionId)
+    setSessionId('');
+    setRole('');
+    setReady(false);
+    setPicked('');
+    resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence);
+  }
+
+  async function handleReset() {
+    resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence);
+    setPicked('');
+    if (mode === 'multi') {
+
+      await supaClient
+        .from('sessions')
+        .update({ u1Weapon: null, u2Weapon: null, status: 'picking' })
+        .eq('id', sessionId)
+    }
+  }
+
+  useEffect(() => {
+    if (!sessionId) return
+
+    const channel = supaClient
+      .channel(sessionId)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'sessions',
+        filter: `id=eq.${sessionId}`
+      }, (payload) => {
+        if (payload.eventType === 'DELETE') {
+          setSessionId(''); setRole(''); setReady(false); setPicked('');
+          setSessionEnded(true);
+          resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence);
+          return;
+        }
+        const { u1Weapon, u2Weapon, status } = payload.new
+        if (status === 'picking.u1' && role === 'u2') { setPicked(u1Weapon) }
+        if (status === 'picking.u2' && role === 'u1') { setPicked(u2Weapon) }
+        if (status === 'joined.u2' && role === 'u1') { setReady(true) }
+        if (status === 'picking') { resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence); setPicked('') }
+
+        if (status === 'result') {
+          let myWeapon, opponentWeapon
+          if (role === 'u1') {
+            myWeapon = u1Weapon; opponentWeapon = u2Weapon
+          } else {
+            myWeapon = u2Weapon; opponentWeapon = u1Weapon
+          }
+          setChosen(myWeapon)
+          setPicker(opponentWeapon)
+          const outcome = calcResult(myWeapon, opponentWeapon, version)
+          setMatches(prev => prev + 1)
+          setResult(outcome.result)
+          setSentence(outcome.sentence)
+          setScore(prev => prev + outcome.playerPoint)
+          setCpuScore(prev => prev + outcome.cpuPoint)
+        }
+
+      })
+      .subscribe()
+
+    return () => supaClient.removeChannel(channel)
+  }, [sessionId, role, version])
 
   return (
     <div className="game-card p-md-4 p-1">
       <h1 className="game-title">ROCK PAPER SCISSORS (LIZARD SPOCK?)</h1>
       <p className="game-subtitle">First choose your version of the game:</p>
-      <div className="version-container">
-        <button className={"version-classic" + ((version === 'classic') ? " is-active" : "")} value="classic" onClick={() => {
-          setVersion('classic');
-          resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence)
-        }}>Classic</button>
-        <button className={"version-advanced" + ((version === 'advanced') ? " is-active" : "")} value="advanced" onClick={() => {
-          setVersion('advanced');
-          resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence)
-        }}>Advanced <img src="/icons/phaser32.png" alt="phaser" /></button>
+      <div className="mode-row">
+        <div className="version-container modality">
+          <button className={"mode-single" + ((mode === 'single') ? " is-active" : "")} value="single" onClick={() => {
+            setMode('single');
+            resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence)
+          }} disabled={mode === 'multi' && sessionId}>Single</button>
+          <button className={"mode-multi" + ((mode === 'multi') ? " is-active" : "")} value="multi" onClick={() => {
+            setMode('multi');
+            resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence)
+          }} disabled={mode === 'multi' && sessionId}>Multi</button>
+        </div>
+        {mode === 'multi' && sessionId && (
+          <button className="leave-btn" onClick={handleLeave} title="Leave session">✕</button>
+        )}
       </div>
+      {mode === 'multi' && !ready ? <Lobby sessionId={sessionId} setSessionId={setSessionId} setRole={setRole} setReady={setReady} version={version} setVersion={setVersion} sessionEnded={sessionEnded} setSessionEnded={setSessionEnded} /> :
+        <div>
+          <div className="version-container versioning">
+            <button className={"version-classic" + ((version === 'classic') ? " is-active" : "")} value="classic" onClick={() => {
+              setVersion('classic');
+              resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence)
+            }} disabled={mode === 'multi'}>Classic</button>
+            <button className={"version-advanced" + ((version === 'advanced') ? " is-active" : "")} value="advanced" onClick={() => {
+              setVersion('advanced');
+              resetCounters(setScore, setMatches, setPicker, setChosen, setResult, setCpuScore, setSentence)
+            }} disabled={mode === 'multi'}>Advanced <img src="/icons/phaser32.png" alt="phaser" /></button>
+          </div>
 
-      <p className="game-subtitle">Then choose your weapon</p>
-      <Chooser setChosen={setChosen} setPicker={setPicker} setScore={setScore} matches={matches} setMatches={setMatches} setResult={setResult} setCpuScore={setCpuScore} version={version} sentence={sentence} setSentence={setSentence} />
-      <Matcher score={score} setScore={setScore} matches={matches} setMatches={setMatches} result={result} setResult={setResult} picker={picker} chosen={chosen} setPicker={setPicker} setChosen={setChosen} cpuscore={cpuscore} setCpuScore={setCpuScore} version={version} sentence={sentence} setSentence={setSentence} />
+          <p className="game-subtitle">Then choose your weapon</p>
+          <Chooser setChosen={setChosen} setPicker={setPicker} setScore={setScore} matches={matches} setMatches={setMatches} setResult={setResult} setCpuScore={setCpuScore} version={version} sentence={sentence} setSentence={setSentence} sessionId={sessionId} role={role} mode={mode} picked={picked} setPicked={setPicked} calcResult={calcResult} />
+          <Matcher score={score} matches={matches} result={result} picker={picker} chosen={chosen} cpuscore={cpuscore} version={version} sentence={sentence} handleReset={handleReset} />
+        </div>
+      }
     </div >
 
   )
