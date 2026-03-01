@@ -64,8 +64,7 @@ function App() {
           return;
         }
         const { u1Weapon, u2Weapon, status } = payload.new
-        console.log('[SUB]', role, status, 'u1:', u1Weapon, 'u2:', u2Weapon)
-        if (status === 'joined.u2' && role === 'u1') { setReady(true) }
+if (status === 'joined.u2' && role === 'u1') { setReady(true) }
         if (status?.startsWith('picking.')) {
           const myWeapon = role === 'u1' ? u1Weapon : u2Weapon
           if (!myWeapon) {
@@ -88,8 +87,8 @@ function App() {
           setChosen(myWeapon)
           setPicker(opponentWeapon)
           const outcome = calcResult(myWeapon, opponentWeapon, version)
-          setTimeout(() => {
-            supaClient
+          setTimeout(async () => {
+            await supaClient
               .from('sessions')
               .update({ u1Weapon: null, u2Weapon: null, status: 'endRound' })
               .eq('id', sessionId).eq('status', 'result')

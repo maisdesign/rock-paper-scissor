@@ -20,12 +20,9 @@ function Chooser({ setChosen, setPicker, setScore, matches, setMatches, setResul
             const opponentField = role === 'u1' ? 'u2Weapon' : 'u1Weapon';
             await supaClient.from('sessions').update({ [myField]: label, status: `picking.${role}` }).eq('id', sessionId);
             setChosenWeapon(label);
-            const { data, error: sErr } = await supaClient.from('sessions').select(opponentField).eq('id', sessionId).single();
-            console.log('[C] select opponent:', JSON.stringify(data), 'err:', sErr?.message);
+            const { data } = await supaClient.from('sessions').select(opponentField).eq('id', sessionId).single();
             if (data?.[opponentField]) {
-                console.log('[C] triggering result');
-                supaClient.from('sessions').update({ status: 'result' }).eq('id', sessionId).neq('status', 'result')
-                    .then(({ error }) => console.log('[C] result update err:', error?.message));
+                supaClient.from('sessions').update({ status: 'result' }).eq('id', sessionId).neq('status', 'result');
             }
         } else {
             const vestratto = userWeapons[getRandomInt(userWeapons.length)].label;
