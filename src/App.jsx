@@ -93,6 +93,7 @@ function App() {
               .from('sessions')
               .update({ u1Weapon: null, u2Weapon: null, status: 'endRound' })
               .eq('id', sessionId).eq('status', 'result')
+            setPicker('start'); setChosen('start'); setSentence(''); setResult(''); setChosenWeapon('')
           }, 1000)
           setMatches(prev => prev + 1)
           setResult(outcome.result)
