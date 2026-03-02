@@ -74,6 +74,10 @@ npm run dev
 4. Both players pick their weapons — results are calculated in real time
 5. Click **Play again** to replay with the same session, or **✕** to leave
 
+## Known Issues / TODO
+
+- **Multiplayer race condition** — the status-based coordination system (`picking` → `picking.u1/u2` → `result` → `endRound`) is prone to edge cases under concurrent writes. Both clients may attempt to transition the session to `status: 'result'` simultaneously; the `.neq('status', 'result')` guard reduces but does not eliminate the risk of double-triggering. Needs audit of the full status transition flow and likely a server-side solution (Postgres function or RLS policy) to make the transition atomic.
+
 ## Project Structure
 
 ```
